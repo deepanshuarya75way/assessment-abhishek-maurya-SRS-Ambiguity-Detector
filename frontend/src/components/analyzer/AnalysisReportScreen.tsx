@@ -177,6 +177,39 @@ function ReportContent() {
               <ArrowLeft className="size-4" aria-hidden />
               Back to Analyzer
             </Link>
+            <button
+            type="button"
+            onClick={() => {
+              const a = state.analysis;
+              const text = [
+                a.title,
+                `Score: ${a.score ?? "Unavailable"}/100`,
+                `Findings: ${a.issues_count}`,
+                "",
+                ...a.requirements.flatMap((r, i) =>[
+                  `Requirement ${i +1}: ${r.text}`,
+                  ...(r.issues.length
+                    ? r.issues.flatMap((issue) => [
+                    `- ${issue.category} (${issue.severity}): ${issue.phrase}`,
+                    ` Reason: ${issue.reason}`,
+                    ` Recommendation: ${issue.recommendation}`,
+                  
+                  ])
+                : ["- No findings"]),
+                "",
+                ]),
+              ].join("\n");
+
+              const link = document.createElement("a");
+              link.href = URL.createObjectURL(new Blob([text], { type: "text/plain" }));
+              link.download = "analysis-report.txt";
+              link.click();
+              URL.revokeObjectURL(link.href);
+            }}
+            >
+              Download report
+              </button>
+            
             <DeleteAnalysisButton analysisId={state.analysis.id} title={state.analysis.title} />
           </>
         }
